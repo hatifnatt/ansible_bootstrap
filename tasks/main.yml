@@ -24,6 +24,21 @@
     update_cache: yes
     # 1 week
     cache_valid_time: 604800
+  when: ansible_os_family == 'Debian'
+
+- name: Installing sudo package (yum)
+  yum:
+    name: sudo
+    state: present
+    update_cache: yes
+  when: ansible_os_family == 'RedHat'
+
+- name: Installing libselinux-python (yum)
+  yum:
+    name: libselinux-python
+    state: present
+    update_cache: yes
+  when: ansible_os_family == 'RedHat'
 
 - name: Creating user for Ansible
   user:
