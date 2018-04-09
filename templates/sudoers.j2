@@ -1,3 +1,5 @@
 ## {{ ansible_managed }}
 Defaults:{{ username }} !requiretty
+Defaults:{{ username }} env_reset
+Defaults:{{ username }} secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 {{ username }}  {{ sudo.runas }}  {{ sudo.commands }}

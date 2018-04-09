@@ -1,7 +1,10 @@
 ---
 
 - name: Install python if necessary
-  raw: test -x /usr/bin/python || (apt-get update && apt-get -y install python)
+  raw: >
+    test -x /usr/bin/python ||
+    (test -x /usr/bin/apt-get && (apt-get update && apt-get -y install python) ||
+    (test -x /usr/bin/yum && yum -y install python || exit 1))
 
 - name: PVE Enterprise repo file is present
   stat:
@@ -69,6 +72,8 @@
   template:
     src: sudoers.j2
     dest: "/etc/sudoers.d/{{ username | regex_replace('\\.', '_') }}"
+    mode: 0440
+    validate: '/usr/sbin/visudo -cf %s'
 
 - name: Set up 'authorized_keys'
   authorized_key:
