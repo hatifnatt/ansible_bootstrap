@@ -1,0 +1,62 @@
+---
+
+- name: Install python if necessary
+  raw: test -x /usr/bin/python || (apt-get update && apt-get -y install python)
+
+- name: PVE Enterprise repo file is present
+  stat:
+    path: /etc/apt/sources.list.d/pve-enterprise.list
+  register: pve_ent
+
+- name: Disable PVE Enterprise repo
+  lineinfile:
+    path: /etc/apt/sources.list.d/pve-enterprise.list
+    backrefs: yes
+    regexp: '^(deb.*)'
+    line: '# \1'
+    state: present
+  when: pve_ent.stat.exists
+
+- name: Installing sudo package (apt)
+  apt:
+    name: sudo
+    state: present
+    update_cache: yes
+    # 1 week
+    cache_valid_time: 604800
+
+- name: Creating user for Ansible
+  user:
+    name: "{{ username }}"
+    password: '*'
+    state: present
+    shell: "/bin/bash"
+
+- name: Check /etc/sudoers.d exists
+  become: yes
+  file:
+    path: /etc/sudoers.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: Enable include of /etc/sudoers.d
+  become: yes
+  lineinfile:
+    name: /etc/sudoers
+    regexp: "^#includedir"
+    line: "#includedir /etc/sudoers.d"
+    state: present
+
+- name: Create config in sudoers.d
+  become: yes
+  template:
+    src: sudoers.j2
+    dest: "/etc/sudoers.d/{{ username | regex_replace('\\.', '_') }}"
+
+- name: Set up 'authorized_keys'
+  authorized_key:
+    user: "{{ username }}"
+    key: "{{ lookup('file', '~/.ssh/' ~ username ~ '.key.pub') }}"
+    manage_dir: yes
