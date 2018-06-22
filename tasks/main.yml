@@ -1,11 +1,5 @@
 ---
 
-- name: Install python if necessary
-  raw: >
-    test -x /usr/bin/python ||
-    (test -x /usr/bin/apt-get && (apt-get update && apt-get -y install python) ||
-    (test -x /usr/bin/yum && yum -y install python || exit 1))
-
 - name: PVE Enterprise repo file is present
   stat:
     path: /etc/apt/sources.list.d/pve-enterprise.list
