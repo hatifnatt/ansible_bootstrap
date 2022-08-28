@@ -1,8 +1,17 @@
 ---
 
-- name: Install python if necessary
+- name: Install Python 3.x if necessary
+  raw: >
+    test -x /usr/bin/python3 ||
+    (test -x /usr/bin/apt-get && (apt-get update && apt-get -y install python3) ||
+    (test -x /usr/bin/yum && yum -y install python3 || exit 1))
+  when: python_version == 3
+  changed_when: False
+
+- name: Install Python 2.x if necessary
   raw: >
     test -x /usr/bin/python ||
     (test -x /usr/bin/apt-get && (apt-get update && apt-get -y install python) ||
     (test -x /usr/bin/yum && yum -y install python || exit 1))
+  when: python_version == 2
   changed_when: False

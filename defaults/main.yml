@@ -4,3 +4,4 @@ username: ansible
 sudo:
   runas: "ALL=(ALL)"
   commands: "NOPASSWD: ALL"
+python_version: 3
