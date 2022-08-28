@@ -29,8 +29,16 @@ ansible-playbook -i %remote.host%, user_for_ansible.yml -u %remoteuser% -kK --be
 
 Where:
 
-  * `%remote.host%` can be DNS hostname or IP address.
-  * `%remoteuser%` must have ssh access.
-  * `%sumethod%` can be `su` or `sudo` ... it depends.
+* `%remote.host%` can be DNS hostname or IP address.
+* `%remoteuser%` must have ssh access.
+* `%sumethod%` can be `su` or `sudo` ... it depends.
 
 On request enter `%remoteuser%` password and `su` or `sudo` password if required.
+
+To properly set up `authorized_keys` for ansible user it's expected that one of the public key files from `public_keys` variable is present on local system, default value for `public_keys` is:
+
+```yaml
+public_keys:
+  - ~/.ssh/ansible.pub
+  - ~/.ssh/ansible.key.pub
+```

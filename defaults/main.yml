@@ -5,3 +5,6 @@ sudo:
   runas: "ALL=(ALL)"
   commands: "NOPASSWD: ALL"
 python_version: 3
+public_keys:
+  - ~/.ssh/ansible.pub
+  - ~/.ssh/ansible.key.pub

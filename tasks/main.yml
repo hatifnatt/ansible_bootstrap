@@ -72,5 +72,7 @@
 - name: Set up 'authorized_keys'
   authorized_key:
     user: "{{ username }}"
-    key: "{{ lookup('file', '~/.ssh/' ~ username ~ '.key.pub') }}"
+    key: "{{ lookup('file', item) }}"
     manage_dir: yes
+  with_first_found:
+    - files: "{{ public_keys }}"
