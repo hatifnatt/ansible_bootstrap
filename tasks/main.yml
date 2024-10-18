@@ -1,78 +1,78 @@
 ---
 
 - name: PVE Enterprise repo file is present
-  stat:
+  ansible.builtin.stat:
     path: /etc/apt/sources.list.d/pve-enterprise.list
   register: pve_ent
 
 - name: Disable PVE Enterprise repo
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/apt/sources.list.d/pve-enterprise.list
-    backrefs: yes
+    backrefs: true
     regexp: '^(deb.*)'
     line: '# \1'
     state: present
   when: pve_ent.stat.exists
 
 - name: Installing sudo package (apt)
-  apt:
+  ansible.builtin.apt:
     name: sudo
     state: present
-    update_cache: yes
+    update_cache: true
     # 1 week
     cache_valid_time: 604800
   when: ansible_os_family == 'Debian'
 
 - name: Installing sudo package (yum)
-  yum:
+  ansible.builtin.package:
     name: sudo
     state: present
-    update_cache: yes
+    update_cache: true
   when: ansible_os_family == 'RedHat'
 
 - name: Installing libselinux-python (yum)
-  yum:
+  ansible.builtin.package:
     name: libselinux-python
     state: present
-    update_cache: yes
+    update_cache: true
   when: ansible_os_family == 'RedHat'
 
 - name: Creating user for Ansible
-  user:
+  ansible.builtin.user:
     name: "{{ username }}"
     password: '*'
     state: present
     shell: "/bin/bash"
 
 - name: Check /etc/sudoers.d exists
-  become: yes
-  file:
+  become: true
+  ansible.builtin.file:
     path: /etc/sudoers.d
     state: directory
     owner: root
     group: root
-    mode: 0750
+    mode: "0750"
 
 - name: Enable include of /etc/sudoers.d
-  become: yes
-  lineinfile:
+  become: true
+  ansible.builtin.lineinfile:
     name: /etc/sudoers
     regexp: "^#includedir"
     line: "#includedir /etc/sudoers.d"
     state: present
 
 - name: Create config in sudoers.d
-  become: yes
-  template:
+  become: true
+  ansible.builtin.template:
     src: sudoers.j2
     dest: "/etc/sudoers.d/{{ username | regex_replace('\\.', '_') }}"
-    mode: 0440
+    mode: "0440"
     validate: '/usr/sbin/visudo -cf %s'
 
 - name: Set up 'authorized_keys'
-  authorized_key:
+  ansible.posix.authorized_key:
     user: "{{ username }}"
     key: "{{ lookup('file', item) }}"
-    manage_dir: yes
+    manage_dir: true
   with_first_found:
     - files: "{{ public_keys }}"

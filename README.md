@@ -7,8 +7,8 @@ Example playbook, let's name it `user_for_ansible.yml`
 
 - name: Install python if required
   hosts: all
-  become: yes
-  gather_facts: no
+  become: true
+  gather_facts: false
   tasks:
     - import_role:
         name: ansible_bootstrap
@@ -16,7 +16,7 @@ Example playbook, let's name it `user_for_ansible.yml`
 
 - name: Prepare host for Ansible
   hosts: all
-  become: yes
+  become: true
   roles:
     - ansible_bootstrap
 ```
